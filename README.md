@@ -9,7 +9,7 @@ To get started using the plugin follow these steps:
 ### 1. Install plugin
 
 ```shell
-npm install --save gatsby-source-google-calendar
+npm install --save @msigwart/gatsby-source-google-calendar
 ```
 
 ### 2. Include the plugin in `gatsby-config.js`
@@ -20,15 +20,18 @@ module.exports = {
     // other gatsby plugins
     // ...
     {
-      calendarId: 'abcdefg1234567@group.calendar.google.com',
-      // options to return the next 10 upcoming events
+      resolve: `@msgiwart/gatsby-source-google-calendar`,
       options: {
-        timeMin: (new Date()).toISOString(),
-        maxResults: 10,
-        singleEvents: true,
-        orderBy: 'startTime',
+        calendarId: 'abc...1234@group.calendar.google.com',
+        // options to retrieve the next 10 upcoming events
+        options: {
+          timeMin: (new Date()).toISOString(),
+          maxResults: 10,
+          singleEvents: true,
+          orderBy: 'startTime',
+        }
       }
-    }
+    },
   ],
 }
 ```

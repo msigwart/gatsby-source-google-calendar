@@ -1,5 +1,5 @@
 {
-  "name": "gatsby-source-google-calendar",
+  "name": "@msigwart/gatsby-source-google-calendar",
   "version": "0.1.0",
   "description": "A Gatsby plugin to source events from a Google Calendar",
   "main": "index.js",
@@ -16,6 +16,15 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "googleapis": "^39.2.0"
-  }
+    "googleapis": "^61.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msigwart/gatsby-source-google-calendar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/msigwart/gatsby-source-google-calendar/issues"
+  },
+  "homepage": "https://github.com/msigwart/gatsby-source-google-calendar#readme"
 }
