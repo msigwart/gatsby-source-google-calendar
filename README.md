@@ -1,113 +1,126 @@
-<p align="center">
-  <a href="https://www.gatsbyjs.com">
-    <img alt="Gatsby" src="https://www.gatsbyjs.com/Gatsby-Monogram.svg" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  Starter for a Gatsby Plugin
-</h1>
+# gatsby-source-google-calendar
 
-A minimal boilerplate for the essential files Gatsby looks for in a plugin.
+A Gatsby plugin to source events from a user's Google Calendar. 
 
-## 🚀 Quick start
+## 🚀 Getting started
 
-To get started creating a new plugin, you can follow these steps:
+To get started using the plugin follow these steps:
 
-1. Initialize a new plugin from the starter with `gatsby new`
+### 1. Install plugin
 
 ```shell
-gatsby new my-plugin https://github.com/gatsbyjs/gatsby-starter-plugin
+npm install --save gatsby-source-google-calendar
 ```
 
-If you already have a Gatsby site, you can use it. Otherwise, you can [create a new Gatsby site](https://www.gatsbyjs.com/tutorial/part-zero/#create-a-gatsby-site) to test your plugin.
-
-Your directory structure will look similar to this:
-
-```text
-/my-gatsby-site
-├── gatsby-config.js
-└── /src
-    └── /pages
-        └── /index.js
-/my-plugin
-├── gatsby-browser.js
-├── gatsby-node.js
-├── gatsby-ssr.js
-├── index.js
-├── package.json
-└── README.md
-```
-
-With `my-gatsby-site` being your Gatsby site, and `my-plugin` being your plugin. You could also include the plugin in your [site's `plugins` folder](https://www.gatsbyjs.com/docs/loading-plugins-from-your-local-plugins-folder/).
-
-2. Include the plugin in a Gatsby site
-
-Inside of the `gatsby-config.js` file of your site (in this case, `my-gatsby-site`), include the plugin in the `plugins` array:
+### 2. Include the plugin in `gatsby-config.js`
 
 ```javascript
 module.exports = {
   plugins: [
     // other gatsby plugins
     // ...
-    require.resolve(`../my-plugin`),
+    {
+      calendarId: 'abcdefg1234567@group.calendar.google.com',
+      // options to return the next 10 upcoming events
+      options: {
+        timeMin: (new Date()).toISOString(),
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: 'startTime',
+      }
+    }
   ],
 }
 ```
 
-The line `require.resolve('../my-plugin')` is what accesses the plugin based on its filepath on your computer, and adds it as a plugin when Gatsby runs.
+### 3. Authorize with Google
 
-_You can use this method to test and develop your plugin before you publish it to a package registry like npm. Once published, you would instead install it and [add the plugin name to the array](https://www.gatsbyjs.com/docs/using-a-plugin-in-your-site/). You can read about other ways to connect your plugin to your site including using `npm link` or `yarn workspaces` in the [doc on creating local plugins](https://www.gatsbyjs.com/docs/creating-a-local-plugin/#developing-a-local-plugin-that-is-outside-your-project)._
+Before you can access the Google Calendar API, you have to 
+[authorize your site with Google](https://developers.google.com/identity/protocols/oauth2/web-server).
 
-3. Verify the plugin was added correctly
+#### Enable Google Calendar API for your project
+To enable an API for your project:
 
-The plugin added by the starter implements a single Gatsby API in the `gatsby-node` that logs a message to the console. When you run `gatsby develop` or `gatsby build` in the site that implements your plugin, you should see this message.
+1. [Open the API Library](https://console.developers.google.com/apis/library) in the Google API Console.
+2. If prompted, select a project, or create a new one.
+3. The API Library lists all available APIs, grouped by product family and popularity. If the API you want to enable isn't visible in the list, use search to find it, or click View All in the product family it belongs to.
+4. Select the API you want to enable, then click the Enable button.
+5. If prompted, enable billing.
+6. If prompted, read and accept the API's Terms of Service.
 
-You can verify your plugin was added to your site correctly by running `gatsby develop` for the site.
-
-You should now see a message logged to the console in the preinit phase of the Gatsby build process:
-
-```shell
-$ gatsby develop
-success open and validate gatsby-configs - 0.033s
-success load plugins - 0.074s
-Loaded gatsby-starter-plugin
-success onPreInit - 0.016s
-...
-```
-
-4. Rename the plugin in the `package.json`
-
-When you clone the site, the information in the `package.json` will need to be updated. Name your plugin based off of [Gatsby's conventions for naming plugins](https://www.gatsbyjs.com/docs/naming-a-plugin/).
-
-## 🧐 What's inside?
-
-This starter generates the [files Gatsby looks for in plugins](https://www.gatsbyjs.com/docs/files-gatsby-looks-for-in-a-plugin/).
+#### Create authorization credentials
+1. Go to the [Credentials page](https://console.developers.google.com/apis/credentials).
+2. Click **Create credentials > OAuth client ID**.
+3. Select the **Web application** application type.
+4. Fill in the form and click **Create**. 
+When prompted for a redirect URI, type in **ht<span>tp://</span>localhost:8000/oAuthCallback**.
+The redirect URI is the endpoint to which the OAuth 2.0 server can send responses.
+It is setup by the plugin automatically.
+5. Store the resulting client configuration (Client ID and Client Secret) in your .env files in the 
+root directory of your project:
 
 ```text
-/my-plugin
-├── .gitignore
-├── gatsby-browser.js
-├── gatsby-node.js
-├── gatsby-ssr.js
-├── index.js
-├── LICENSE
-├── package.json
-└── README.md
+GOOGLE_CLIENT_ID=111122223333-123abcdef34567ghijklmnop.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=123ABC_987xyz
 ```
 
-- **`.gitignore`**: This file tells git which files it should not track / not maintain a version history for.
-- **`gatsby-browser.js`**: This file is where Gatsby expects to find any usage of the [Gatsby browser APIs](https://www.gatsbyjs.com/docs/browser-apis/) (if any). These allow customization/extension of default Gatsby settings affecting the browser.
-- **`gatsby-node.js`**: This file is where Gatsby expects to find any usage of the [Gatsby Node APIs](https://www.gatsbyjs.com/docs/node-apis/) (if any). These allow customization/extension of default Gatsby settings affecting pieces of the site build process.
-- **`gatsby-ssr.js`**: This file is where Gatsby expects to find any usage of the [Gatsby server-side rendering APIs](https://www.gatsbyjs.com/docs/ssr-apis/) (if any). These allow customization of default Gatsby settings affecting server-side rendering.
-- **`index.js`**: A file that will be loaded by default when the plugin is [required by another application](https://docs.npmjs.com/creating-node-js-modules#create-the-file-that-will-be-loaded-when-your-module-is-required-by-another-application0). You can adjust what file is used by updating the `main` field of the `package.json`.
-- **`LICENSE`**: This plugin starter is licensed under the 0BSD license. This means that you can see this file as a placeholder and replace it with your own license.
-- **`package.json`**: A manifest file for Node.js projects, which includes things like metadata (the plugin's name, author, etc). This manifest is how npm knows which packages to install for your project.
-- **`README.md`**: A text file containing useful reference information about your plugin.
+#### Retrieve API tokens
+Once you've stored the client credentials, execute `gatsby develop`. 
+When first executed, the plugin throws the following error:
 
-## 🎓 Learning Gatsby
+```text
+"gatsby-source-google-calendar" threw an error while running the sourceNodes lifecycle:
 
-If you're looking for more guidance on plugins, how they work, or what their role is in the Gatsby ecosystem, check out some of these resources:
+    Authorize this app by visiting this url:
 
-- The [Creating Plugins](https://www.gatsbyjs.com/docs/creating-plugins/) section of the docs has information on authoring and maintaining plugins yourself.
-- The conceptual guide on [Plugins, Themes, and Starters](https://www.gatsbyjs.com/docs/plugins-themes-and-starters/) compares and contrasts plugins with other pieces of the Gatsby ecosystem. It can also help you [decide what to choose between a plugin, starter, or theme](https://www.gatsbyjs.com/docs/plugins-themes-and-starters/#deciding-which-to-use).
-- The [Gatsby plugin library](https://www.gatsbyjs.com/plugins/) has over 1750 official as well as community developed plugins that can get you up and running faster and borrow ideas from.
+https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.readonly&response_type=code&client_id=111122223333-123abcdef34567ghijklmnop.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2FoAuthCallback
+```
+
+Visit the displayed URL and follow the steps to complete the authorization.
+On successful authorization, the plugin prints out the access and refresh tokens to the console:
+
+```text
+Successfully authorized app for Google Calendar API.
+Store the following values in your .env files then restart gatsby develop:
+
+GOOGLE_ACCESS_TOKEN=abc...123
+GOOGLE_REFRESH_TOKEN=123...abc
+```
+
+Store these values in your `.env` files, then restart `gatsby develop`.
+The plugin should now query the events from Google Calendar.
+
+> **Important:** You should never expose API keys to your source control
+> so you should not commit `.env` files to your source control 
+> (make sure they are listed in `.gitignore`). 
+> Services like Netlify provide a secure way to [include environment variables
+> for your builds](https://www.netlify.com/docs/continuous-deployment/#build-environment-variables)).
+
+### 4. Accessing events in your site
+To access the sourced events in your site write a GraphQL query like this:
+```graphql
+query MyEventsQuery {
+  allEvent {
+    edges {
+      node {
+        start {
+          dateTime
+        }
+        end {
+          dateTime
+        }
+        description
+        summary
+      }
+    }
+  }
+}
+```
+
+## How to contribute
+Contributions are very welcome!
+File a bug report or submit feature requests through the [issue tracker](https://github.com/msigwart/gatsby-source-google-calendar/issues). 
+Of course, you can also just submit a pull request 😉
+
+## Licence
+This project is licensed under the [MIT License](LICENSE).
