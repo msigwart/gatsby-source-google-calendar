@@ -20,7 +20,7 @@ module.exports = {
     // other gatsby plugins
     // ...
     {
-      resolve: `@msgiwart/gatsby-source-google-calendar`,
+      resolve: `@msigwart/gatsby-source-google-calendar`,
       options: {
         calendarId: 'abc...1234@group.calendar.google.com',
         // options to retrieve the next 10 upcoming events
