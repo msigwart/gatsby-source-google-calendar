@@ -1,6 +1,6 @@
 # gatsby-source-google-calendar
 
-A Gatsby plugin to source events from a user's Google Calendar. 
+A Gatsby plugin to source events from a user's Google Calendars. 
 
 ## 🚀 Getting started
 
@@ -9,7 +9,7 @@ To get started using the plugin follow these steps:
 ### 1. Install plugin
 
 ```shell
-npm install --save @msigwart/gatsby-source-google-calendar
+npm install @msigwart/gatsby-source-google-calendar
 ```
 
 ### 2. Include the plugin in `gatsby-config.js`
@@ -22,19 +22,26 @@ module.exports = {
     {
       resolve: `@msigwart/gatsby-source-google-calendar`,
       options: {
-        calendarId: 'abc...1234@group.calendar.google.com',
+        calendarIds: [
+          'abc...1234@group.calendar.google.com',
+        ],
         // options to retrieve the next 10 upcoming events
-        options: {
-          timeMin: (new Date()).toISOString(),
-          maxResults: 10,
-          singleEvents: true,
-          orderBy: 'startTime',
-        }
+        timeMin: (new Date()).toISOString(),
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: 'startTime',
       }
     },
   ],
 }
 ```
+
+All options are optional. 
+Specify the IDs of all the calendars you wish to query in the array `calendarIds`.
+If you omit this field, it will query all calendars of the authenticated Google user.
+You can further specify fields to filter the events of the calendars 
+(e.g. minimum start/maximum end date, number of returned results, etc.).
+A full list of options can be found [here](https://developers.google.com/calendar/v3/reference/events/list).
 
 ### 3. Authorize with Google
 
@@ -99,26 +106,34 @@ The plugin should now query the events from Google Calendar.
 > Services like Netlify provide a secure way to [include environment variables
 > for your builds](https://www.netlify.com/docs/continuous-deployment/#build-environment-variables)).
 
-### 4. Accessing events in your site
-To access the sourced events in your site write a GraphQL query like this:
+### 4. Accessing calendars and events in your site
+To access the sourced calendars and events in your site write a GraphQL query like this:
 ```graphql
-query MyEventsQuery {
-  allEvent {
+query MyCalendarQuery {
+  allCalendar {
     edges {
       node {
-        start {
-          dateTime
-        }
-        end {
-          dateTime
-        }
-        description
         summary
+        description
+        childrenCalendarEvent {
+          summary
+          start {
+            date
+            dateTime
+          }
+          description
+          end {
+            date
+            dateTime
+          }
+        }
       }
     }
   }
 }
 ```
+This will return all calendars (with summary and description) with their 
+respective events (`childrenCalendarEvent`).
 
 ## How to contribute
 Contributions are very welcome!

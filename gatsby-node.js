@@ -41,24 +41,20 @@ exports.onCreateDevServer = ({ app }) => {
     }
     const code = req.query.code;
     try {
-      const token = await new Promise((resolve, reject) => {
-        oAuth2Client.getToken(code, (err, token) => {
-          if (err) reject('Error retrieving access token', err);
-          resolve(token);
-        })
-      });
-      console.log(
+      const tokens = (await oAuth2Client.getToken(code)).tokens;
+      console.info(
 `
 (Plugin gatsby-source-google-calendar)
 Successfully authorized site for Google Calendar API.
 Store the following values in your .env files then restart gatsby develop:
 
-GOOGLE_ACCESS_TOKEN=${token.access_token}
-GOOGLE_REFRESH_TOKEN=${token.refresh_token}
+GOOGLE_ACCESS_TOKEN=${tokens.access_token}
+GOOGLE_REFRESH_TOKEN=${tokens.refresh_token}
 `     );
       res.send('Successfully authorized.')
     } catch (error) {
       res.send(error);
+      console.warn(`Failed to authorize site for Google Calendar API (${JSON.stringify(error)})`);
     }
   });
 }
@@ -76,18 +72,32 @@ exports.sourceNodes = async ({
   // Authorize a client with credentials, then query events via Google Calendar API.
   const oAuth2Client = createOAuth2Client();
   checkAuthorization(oAuth2Client);
-  const events = await getEvents(oAuth2Client, pluginOptions.calendarId, pluginOptions.options);
+  const calendars = await getCalendars(oAuth2Client, pluginOptions.calendarIds);
+  // const events = await getEvents(oAuth2Client, pluginOptions.calendarId, pluginOptions.options);
 
-  // constants for your GraphQL Post and Author types
-  const EVENT_NODE_TYPE = `Event`
+  // constants for your GraphQL Calendar and CalendarEvent types
+  const CALENDAR_NODE_TYPE = `Calendar`
+  const EVENT_NODE_TYPE = `CalendarEvent`
 
-  if (events.length) {
-    // loop through data and create Gatsby nodes
-    events.forEach(event =>
+  if (!calendars.length) {
+    throw 'No calendars found';
+  }
+
+  // loop through data, query events and create Gatsby nodes for calendar and events
+  for (let calendar of calendars) {
+    const calendarNodeId = createNodeId(`${CALENDAR_NODE_TYPE}-${calendar.id}`);
+    const queryParams = { ...pluginOptions };
+    const events = await getEvents(oAuth2Client, calendar.id, queryParams);
+    if (!events.length) {
+      console.warn(`gatsby-source-google-calendar: no events found (calendar ${calendar.id})`);
+    }
+    const children = [];
+    events.forEach(event => {
+      const eventNodeId = createNodeId(`${EVENT_NODE_TYPE}-${event.id}`);
       createNode({
         ...event,
-        id: createNodeId(`${EVENT_NODE_TYPE}-${event.id}`),
-        parent: null,
+        id: eventNodeId,
+        parent: calendarNodeId,
         children: [],
         internal: {
           type: EVENT_NODE_TYPE,
@@ -95,9 +105,19 @@ exports.sourceNodes = async ({
           contentDigest: createContentDigest(event.description),
         },
       })
-    );
-  } else {
-    throw 'No upcoming events found';
+      children.push(eventNodeId);
+    });
+    createNode({
+      ...calendar,
+      id: calendarNodeId,
+      parent: null,
+      children: children,
+      internal: {
+        type: CALENDAR_NODE_TYPE,
+        content: JSON.stringify(calendar),
+        contentDigest: createContentDigest(calendar.description ? calendar.description : calendar.summary),
+      },
+    });
   }
 }
 
@@ -146,6 +166,24 @@ ${authUrl}
   }
 }
 
+
+/**
+ * Lists the calendars of the user.
+ * By default all calendars of the user are returned.
+ * Optionally an array containing the IDs of the Google calendars to be queried can be specified.
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ * @param {Array} calendarIds An array containing the IDs of the Google calendars to retrieve
+ */
+async function getCalendars(auth, calendarIds = []) {
+  const calendar = google.calendar({version: 'v3', auth});
+  if (calendarIds.length) {
+    return await Promise.all(calendarIds.map(async calendarId => (await calendar.calendarList.get({
+      calendarId
+    })).data));
+  }
+  return (await calendar.calendarList.list()).data.items;
+}
+
 /**
  * Lists the events of the calendar with the provided calendarId.
  * Various options can be passed to e.g.
@@ -155,20 +193,13 @@ ${authUrl}
  * For a full list of options visit
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  * @param {string} calendarId An ID of a Google Calendar.
- * @param {Object} options Options to be passed to the calendar event list query
+ * @param {Object} queryParams Options to be passed to the calendar event list query
  */
-async function getEvents(auth, calendarId, options) {
-  return new Promise((resolve, reject) => {
-    const calendar = google.calendar({version: 'v3', auth});
-    calendar.events.list({
-      calendarId,
-      ...options
-    }, (err, res) => {
-      if (err) return reject(err);
-      const events = res.data.items;
-      return resolve(events);
-    });
-  })
-
+async function getEvents(auth, calendarId, queryParams) {
+  const calendar = google.calendar({version: 'v3', auth});
+  return (await calendar.events.list({
+    calendarId,
+    ...queryParams
+  })).data.items;
 }
 
