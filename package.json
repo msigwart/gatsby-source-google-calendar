@@ -1,6 +1,6 @@
 {
   "name": "@msigwart/gatsby-source-google-calendar",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Gatsby plugin to source events from a Google Calendar",
   "main": "index.js",
   "scripts": {
