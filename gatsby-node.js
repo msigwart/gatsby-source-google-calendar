@@ -102,7 +102,7 @@ exports.sourceNodes = async ({
         internal: {
           type: EVENT_NODE_TYPE,
           content: JSON.stringify(event),
-          contentDigest: createContentDigest(event.description),
+          contentDigest: createContentDigest(JSON.stringify(event)),
         },
       })
       children.push(eventNodeId);
@@ -115,7 +115,7 @@ exports.sourceNodes = async ({
       internal: {
         type: CALENDAR_NODE_TYPE,
         content: JSON.stringify(calendar),
-        contentDigest: createContentDigest(calendar.description ? calendar.description : calendar.summary),
+        contentDigest: createContentDigest(JSON.stringify(calendar)),
       },
     });
   }
