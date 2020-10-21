@@ -1,3 +1,5 @@
+![plugin image](image.png)
+
 # gatsby-source-google-calendar
 
 A Gatsby plugin to source events from a user's Google Calendars. 
