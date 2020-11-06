@@ -1,4 +1,7 @@
 # Changelog
+## 1.0.1
+* Moved package from @msigwart/gatsby-source-google-calendar to gatsby-source-google-calendar (used version 1.0.1 instead of 1.0.0 to avoid conflicting with previously published package)
+
 ## 0.2.1
 * Fix error that was caused when an event does not have a description ([#1](https://github.com/msigwart/gatsby-source-google-calendar/issues/1))
 

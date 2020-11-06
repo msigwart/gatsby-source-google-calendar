@@ -11,7 +11,7 @@ To get started using the plugin follow these steps:
 ### 1. Install plugin
 
 ```shell
-npm install @msigwart/gatsby-source-google-calendar
+npm install gatsby-source-google-calendar
 ```
 
 ### 2. Include the plugin in `gatsby-config.js`
@@ -22,7 +22,7 @@ module.exports = {
     // other gatsby plugins
     // ...
     {
-      resolve: `@msigwart/gatsby-source-google-calendar`,
+      resolve: `gatsby-source-google-calendar`,
       options: {
         calendarIds: [
           'abc...1234@group.calendar.google.com',
