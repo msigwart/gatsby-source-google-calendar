@@ -104,12 +104,12 @@ exports.sourceNodes = async ({
         // event is "all-day"
         event.start = {
           ...event.start,
-          dateTime: moment(event.start.date).tz(calendar.timeZone).format(),
+          dateTime: moment(event.start.date).tz(calendar.timeZone, true).format(),
           timeZone: calendar.timeZone
         };
         event.end = {
           ...event.end,
-          dateTime: moment(event.end.date).tz(calendar.timeZone).format(),
+          dateTime: moment(event.end.date).tz(calendar.timeZone, true).format(),
           timeZone: calendar.timeZone
         };
         event.allDay = true;
