@@ -1,6 +1,9 @@
 # Changelog
+## 1.1.1
+* Instantiate `dateTime` field of 'all-day' event relative to local timezone
+
 ## 1.1.0
-* Add `allDay` flag to event data indicating whether or not an event is 'all-day'
+* Add `allDay` flag to event data indicating whether or not an event is 'all-day' ([#3](https://github.com/msigwart/gatsby-source-google-calendar/issues/2))
 * If an event is 'all-day', populate the event's `dateTime` field with the event's 
 `date` taking the calendar's `timeZone` into account
 
