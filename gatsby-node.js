@@ -4,6 +4,7 @@
  * See: https://www.gatsbyjs.com/docs/node-apis/
  */
 const {google} = require("googleapis");
+const moment = require('moment-timezone');
 
 /**
  * You can uncomment the following line to verify that
@@ -99,7 +100,23 @@ exports.sourceNodes = async ({
       // An empty value should be provided in-case queries are referencing it.
       if(!event.description) event.description = '';
 
-      event.allDay = event.start.date && event.end.date;
+      if(event.start.date && event.end.date) {
+        // event is "all-day"
+        event.start = {
+          ...event.start,
+          dateTime: moment(event.start.date).tz(calendar.timeZone, true).format(),
+          timeZone: calendar.timeZone
+        };
+        event.end = {
+          ...event.end,
+          dateTime: moment(event.end.date).tz(calendar.timeZone, true).format(),
+          timeZone: calendar.timeZone
+        };
+        event.allDay = true;
+      }
+      else {
+        event.allDay = false;
+      }
 
       createNode({
         ...event,
