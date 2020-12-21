@@ -16,8 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "googleapis": "^61.0.0",
-    "moment-timezone": "^0.5.32"
+    "googleapis": "^61.0.0"
   },
   "devDependencies": {},
   "repository": {
