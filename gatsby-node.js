@@ -4,6 +4,7 @@
  * See: https://www.gatsbyjs.com/docs/node-apis/
  */
 const {google} = require("googleapis");
+const moment = require('moment-timezone');
 
 /**
  * You can uncomment the following line to verify that
@@ -94,6 +95,28 @@ exports.sourceNodes = async ({
     const children = [];
     events.forEach(event => {
       const eventNodeId = createNodeId(`${EVENT_NODE_TYPE}-${event.id}`);
+
+      // If no events have a description, then Google does not send the field.
+			// An empty value should be provided in-case queries are referencing it.
+			if(!event.description) event.description = '';
+
+			// The date field is named `date` instead of `dateTime` for all-day events.
+			// We have to translate this into the expected schema.
+			if(event.start.date && event.start.date) {
+				event.start = {
+					dateTime: moment(event.start.date).tz(calendar.timeZone).format(),
+					timeZone: calendar.timeZone
+				};
+				event.end = {
+					dateTime: moment(event.end.date).tz(calendar.timeZone).format(),
+					timeZone: calendar.timeZone
+				};
+				event.allDay = true;
+			}
+			else {
+				event.allDay = false;
+			}
+
       createNode({
         ...event,
         id: eventNodeId,
