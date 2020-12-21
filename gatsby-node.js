@@ -94,6 +94,19 @@ exports.sourceNodes = async ({
     const children = [];
     events.forEach(event => {
       const eventNodeId = createNodeId(`${EVENT_NODE_TYPE}-${event.id}`);
+
+      // If no events have a description, then Google does not send the field.
+      // An empty value should be provided in-case queries are referencing it.
+      if(!event.description) event.description = '';
+
+      // Some events may specify either `date` or `dateTime`.
+      // These fields must be nulled if not provided so Gatsby can
+      // determine the schema more accurately.
+      if(!event.start.date) event.start.date = null;
+      if(!event.start.dateTime) event.start.dateTime = null;
+      if(!event.end.date) event.end.date = null;
+      if(!event.end.dateTime) event.end.dateTime = null;
+
       createNode({
         ...event,
         id: eventNodeId,
