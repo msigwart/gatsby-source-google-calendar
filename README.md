@@ -137,6 +137,13 @@ query MyCalendarQuery {
 This will return all calendars (with summary and description) with their 
 respective events (`childrenCalendarEvent`).
 
+The event schema generally follows [the event schema of the Google Calendar API](https://developers.google.com/calendar/v3/reference/events#resource).
+However, the plugin adds an additional `allDay` flag indicating whether or not an event is marked as *all-day*.
+
+Further, if an event is marked *all-day*, the plugin populates the event's `dateTime` field with the 
+event's `date` field taking into account the calendar's timezone. 
+This allows unified filtering of all kinds of events (*all-day* or not) in GraphQL queries. 
+
 ## How to contribute
 Contributions are very welcome!
 File a bug report or submit feature requests through the [issue tracker](https://github.com/msigwart/gatsby-source-google-calendar/issues). 

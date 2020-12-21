@@ -1,4 +1,9 @@
 # Changelog
+## 1.1.0
+* Add `allDay` flag to event data indicating whether or not an event is 'all-day'
+* If an event is 'all-day', populate the event's `dateTime` field with the event's 
+`date` taking the calendar's `timeZone` into account
+
 ## 1.0.1
 * Moved package from @msigwart/gatsby-source-google-calendar to gatsby-source-google-calendar (used version 1.0.1 instead of 1.0.0 to avoid conflicting with previously published package)
 
