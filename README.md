@@ -142,7 +142,9 @@ However, the plugin adds an additional `allDay` flag indicating whether or not a
 
 Further, if an event is marked *all-day*, the plugin populates the event's `dateTime` field with the 
 event's `date` field taking into account the calendar's timezone. 
-This allows unified filtering of all kinds of events (*all-day* or not) in GraphQL queries. 
+This allows unified filtering of all kinds of events (*all-day* or not) in GraphQL queries.
+
+Visit `http://localhost:8000/___graphql` to check out the created data and schema.
 
 ## How to contribute
 Contributions are very welcome!
