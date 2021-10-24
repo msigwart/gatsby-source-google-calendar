@@ -51,6 +51,8 @@ Store the following values in your .env files then restart gatsby develop:
 
 GOOGLE_ACCESS_TOKEN=${tokens.access_token}
 GOOGLE_REFRESH_TOKEN=${tokens.refresh_token}
+
+Important: Ensure there are no line breaks when copying the values.
 `     );
       res.send('Successfully authorized.')
     } catch (error) {
