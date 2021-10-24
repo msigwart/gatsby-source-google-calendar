@@ -15,11 +15,10 @@
   "author": "Marten Sigwart <marten@okamaja.de>",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^8.2.0",
-    "googleapis": "^61.0.0",
+    "dotenv": "^10.0.0",
+    "googleapis": "^89.0.0",
     "moment-timezone": "^0.5.32"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/msigwart/gatsby-source-google-calendar.git"
