@@ -99,7 +99,8 @@ GOOGLE_ACCESS_TOKEN=abc...123
 GOOGLE_REFRESH_TOKEN=123...abc
 ```
 
-Store these values in your `.env` files, then restart `gatsby develop`.
+Store these lines (e.g. the complete `FIELD=VALUE` lines without
+newlines) in your `.env` files, then restart `gatsby develop`.
 The plugin should now query the events from Google Calendar.
 
 > **Important:** You should never expose API keys to your source control
@@ -145,6 +146,15 @@ event's `date` field taking into account the calendar's timezone.
 This allows unified filtering of all kinds of events (*all-day* or not) in GraphQL queries.
 
 Visit `http://localhost:8000/___graphql` to check out the created data and schema.
+
+## Troubleshooting
+### Plugin throws `Error: invalid_grant`
+If the plugin throw an `invalid_grant` error it means that the provided Google refresh token is invalid.
+While there may be [a number of causes for this](https://blog.timekit.io/google-oauth-invalid-grant-nightmare-and-how-to-fix-it-9f4efaf1da35#.eqa5iwbkt), here are some things you can try to resolve this issue:
+1. Ensure that the token is correct, i.e. your `.env.*` files don't include any accidental line breaks.
+2. Remove values for `GOOGLE_ACCESS_TOKEN` and `GOOGLE_REFRESH_TOKEN` and restart the authentication process.
+3. [Revoke access to your Google Account for your app](https://support.google.com/accounts/answer/3466521?hl=en) and restart the authentication process. 
+4. If above doesn't help, [set up a new OAuth2 client in the Google Console](https://github.com/msigwart/gatsby-source-google-calendar#create-authorization-credentials).
 
 ## How to contribute
 Contributions are very welcome!
