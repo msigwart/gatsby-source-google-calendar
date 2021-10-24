@@ -1,4 +1,8 @@
 # Changelog
+## 1.1.2
+* Update dependencies
+* Improve documentation
+
 ## 1.1.1
 * Instantiate `dateTime` field of 'all-day' event relative to local timezone
 
