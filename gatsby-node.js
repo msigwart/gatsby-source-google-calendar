@@ -147,6 +147,28 @@ exports.sourceNodes = async ({
   }
 }
 
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions
+  const typeDefs = `
+    type Calendar implements Node {
+      summary: String!
+      description: String
+      children: [CalendarEvent]
+    }
+    type EventDate {
+      dateTime: String!
+      timeZone: String!
+    }
+    type CalendarEvent implements Node {
+      summary: String!
+      description: String
+      start: EventDate!
+      end: EventDate!
+      allDay: Boolean!
+    }
+  `
+  createTypes(typeDefs)
+}
 
 function createOAuth2Client() {
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
