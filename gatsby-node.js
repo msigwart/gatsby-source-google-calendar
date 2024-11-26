@@ -70,17 +70,23 @@ exports.sourceNodes = async ({
                              },
                              pluginOptions
 ) => {
-  const { createNode } = actions
+  const { createNode, deleteNode } = actions;
 
   // Authorize a client with credentials, then query events via Google Calendar API.
   const oAuth2Client = createOAuth2Client();
   checkAuthorization(oAuth2Client);
   const calendars = await getCalendars(oAuth2Client, pluginOptions.calendarIds);
-  // const events = await getEvents(oAuth2Client, pluginOptions.calendarId, pluginOptions.options);
 
   // constants for your GraphQL Calendar and CalendarEvent types
-  const CALENDAR_NODE_TYPE = `Calendar`
-  const EVENT_NODE_TYPE = `CalendarEvent`
+  const CALENDAR_NODE_TYPE = `Calendar`;
+  const EVENT_NODE_TYPE = `CalendarEvent`;
+
+  // Delete all existing nodes before creating new ones
+  const existingCalendarNodes = getNodesByType(CALENDAR_NODE_TYPE);
+  const existingEventNodes = getNodesByType(EVENT_NODE_TYPE);
+  [...existingEventNodes, ...existingCalendarNodes].forEach((node) => {
+    deleteNode({ node });
+  });
 
   if (!calendars.length) {
     throw 'No calendars found';
