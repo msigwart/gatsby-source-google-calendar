@@ -85,7 +85,7 @@ exports.sourceNodes = async (
   const existingCalendarNodes = getNodesByType(CALENDAR_NODE_TYPE);
   const existingEventNodes = getNodesByType(EVENT_NODE_TYPE);
   [...existingEventNodes, ...existingCalendarNodes].forEach((node) => {
-    deleteNode({ node });
+    deleteNode(node);
   });
 
   if (!calendars.length) {
