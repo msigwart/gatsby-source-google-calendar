@@ -3,8 +3,8 @@
  *
  * See: https://www.gatsbyjs.com/docs/node-apis/
  */
-const {google} = require("googleapis");
-const moment = require('moment-timezone');
+const { google } = require("googleapis");
+const moment = require("moment-timezone");
 
 /**
  * You can uncomment the following line to verify that
@@ -16,7 +16,7 @@ exports.onPreInit = () => {
   require("dotenv").config({
     path: `.env.${process.env.NODE_ENV}`,
   });
-}
+};
 
 /**
  * Callback for oAuth2 authentication
@@ -33,8 +33,7 @@ exports.onPreInit = () => {
 exports.onCreateDevServer = ({ app }) => {
   const oAuth2Client = createOAuth2Client();
 
-
-  app.get('/oAuthCallback', async function (req, res) {
+  app.get("/oAuthCallback", async function (req, res) {
     const error = req.query.error;
     if (error) {
       res.send(error);
@@ -44,7 +43,7 @@ exports.onCreateDevServer = ({ app }) => {
     try {
       const tokens = (await oAuth2Client.getToken(code)).tokens;
       console.info(
-`
+        `
 (Plugin gatsby-source-google-calendar)
 Successfully authorized site for Google Calendar API.
 Store the following values in your .env files then restart gatsby develop:
@@ -53,22 +52,23 @@ GOOGLE_ACCESS_TOKEN=${tokens.access_token}
 GOOGLE_REFRESH_TOKEN=${tokens.refresh_token}
 
 Important: Ensure there are no line breaks when copying the values.
-`     );
-      res.send('Successfully authorized.')
+`
+      );
+      res.send("Successfully authorized.");
     } catch (error) {
       res.send(error);
-      console.warn(`Failed to authorize site for Google Calendar API (${JSON.stringify(error)})`);
+      console.warn(
+        `Failed to authorize site for Google Calendar API (${JSON.stringify(
+          error
+        )})`
+      );
     }
   });
-}
+};
 
-exports.sourceNodes = async ({
-                               actions,
-                               createContentDigest,
-                               createNodeId,
-                               getNodesByType,
-                             },
-                             pluginOptions
+exports.sourceNodes = async (
+  { actions, createContentDigest, createNodeId, getNodesByType },
+  pluginOptions
 ) => {
   const { createNode, deleteNode } = actions;
 
@@ -89,7 +89,7 @@ exports.sourceNodes = async ({
   });
 
   if (!calendars.length) {
-    throw 'No calendars found';
+    throw "No calendars found";
   }
 
   // loop through data, query events and create Gatsby nodes for calendar and events
@@ -98,31 +98,34 @@ exports.sourceNodes = async ({
     const queryParams = { ...pluginOptions };
     const events = await getEvents(oAuth2Client, calendar.id, queryParams);
     if (!events.length) {
-      console.warn(`gatsby-source-google-calendar: no events found (calendar ${calendar.id})`);
+      console.warn(
+        `gatsby-source-google-calendar: no events found (calendar ${calendar.id})`
+      );
     }
     const children = [];
-    events.forEach(event => {
+    events.forEach((event) => {
       const eventNodeId = createNodeId(`${EVENT_NODE_TYPE}-${event.id}`);
 
       // If no events have a description, then Google does not send the field.
       // An empty value should be provided in-case queries are referencing it.
-      if(!event.description) event.description = '';
+      if (!event.description) event.description = "";
 
-      if(event.start.date && event.end.date) {
+      if (event.start.date && event.end.date) {
         // event is "all-day"
         event.start = {
           ...event.start,
-          dateTime: moment(event.start.date).tz(calendar.timeZone, true).format(),
-          timeZone: calendar.timeZone
+          dateTime: moment(event.start.date)
+            .tz(calendar.timeZone, true)
+            .format(),
+          timeZone: calendar.timeZone,
         };
         event.end = {
           ...event.end,
           dateTime: moment(event.end.date).tz(calendar.timeZone, true).format(),
-          timeZone: calendar.timeZone
+          timeZone: calendar.timeZone,
         };
         event.allDay = true;
-      }
-      else {
+      } else {
         event.allDay = false;
       }
 
@@ -136,7 +139,7 @@ exports.sourceNodes = async ({
           content: JSON.stringify(event),
           contentDigest: createContentDigest(JSON.stringify(event)),
         },
-      })
+      });
       children.push(eventNodeId);
     });
     createNode({
@@ -151,10 +154,10 @@ exports.sourceNodes = async ({
       },
     });
   }
-}
+};
 
 exports.createSchemaCustomization = ({ actions }) => {
-  const { createTypes } = actions
+  const { createTypes } = actions;
   const typeDefs = `
     type Calendar implements Node {
       summary: String!
@@ -172,9 +175,9 @@ exports.createSchemaCustomization = ({ actions }) => {
       end: EventDate!
       allDay: Boolean!
     }
-  `
-  createTypes(typeDefs)
-}
+  `;
+  createTypes(typeDefs);
+};
 
 function createOAuth2Client() {
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -188,7 +191,7 @@ function createOAuth2Client() {
 
     Follow the workflow and then store Client ID and Client Secret in your .env* files as
     GOOGLE_CLIENT_ID=<client_id>
-    GOOGLE_CLIENT_SECRET=<client_secret>`
+    GOOGLE_CLIENT_SECRET=<client_secret>`;
   }
   return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 }
@@ -198,28 +201,25 @@ function createOAuth2Client() {
  * @param {Object} oAuth2Client The authorization client.
  */
 function checkAuthorization(oAuth2Client) {
-
   // If modifying these scopes, delete GOOGLE_ACCESS_TOKEN and GOOGLE_REFRESH_TOKEN values from .env files.
-  const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
+  const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 
   // Check if the API access token exists
   let access_token = process.env.GOOGLE_ACCESS_TOKEN;
   let refresh_token = process.env.GOOGLE_REFRESH_TOKEN;
   if (!access_token) {
-
     const authUrl = oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
+      access_type: "offline",
       scope: SCOPES,
     });
     throw `    Authorize this app by visiting this url:
     
 ${authUrl}
-    `
+    `;
   } else {
     oAuth2Client.setCredentials({ access_token, refresh_token });
   }
 }
-
 
 /**
  * Lists the calendars of the user.
@@ -229,11 +229,18 @@ ${authUrl}
  * @param {Array} calendarIds An array containing the IDs of the Google calendars to retrieve
  */
 async function getCalendars(auth, calendarIds = []) {
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({ version: "v3", auth });
   if (calendarIds.length) {
-    return await Promise.all(calendarIds.map(async calendarId => (await calendar.calendarList.get({
-      calendarId
-    })).data));
+    return await Promise.all(
+      calendarIds.map(
+        async (calendarId) =>
+          (
+            await calendar.calendarList.get({
+              calendarId,
+            })
+          ).data
+      )
+    );
   }
   return (await calendar.calendarList.list()).data.items;
 }
@@ -250,10 +257,11 @@ async function getCalendars(auth, calendarIds = []) {
  * @param {Object} queryParams Options to be passed to the calendar event list query
  */
 async function getEvents(auth, calendarId, queryParams) {
-  const calendar = google.calendar({version: 'v3', auth});
-  return (await calendar.events.list({
-    calendarId,
-    ...queryParams
-  })).data.items;
+  const calendar = google.calendar({ version: "v3", auth });
+  return (
+    await calendar.events.list({
+      calendarId,
+      ...queryParams,
+    })
+  ).data.items;
 }
-
