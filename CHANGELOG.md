@@ -1,4 +1,10 @@
 # Changelog
+## 1.1.4
+* Fix: Remove existing calendar and event nodes before creating new ones to prevent stale data
+
+## 1.1.3
+* Add schema definitions
+
 ## 1.1.2
 * Update dependencies
 * Improve documentation
